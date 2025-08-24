@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>大三島みんなのワイナリー 診断</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #dff6ff 0%, #f4fbff 50%, #fff 100%);
+      color: #222;
+      box-sizing: border-box;
+    }
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 32px 12px 64px 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px 0 rgba(14, 165, 233, 0.07), 0 0.5px 0 rgba(255,255,255,0.13) inset;
+      border: 1.8px solid #d2e9f7;
+      margin: 0 auto 32px auto;
+      padding: 32px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.2s;
+      min-height: 420px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .card-start {
+      min-height: 340px;
+      text-align: center;
+      animation: popIn 0.7s cubic-bezier(.28,.84,.42,1);
+    }
+    .big-title {
+      font-size: 2em;
+      font-weight: bold;
+      background: linear-gradient(90deg,#0ea5e9 5%,#ff7a00 95%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+      letter-spacing:0.04em;
+      text-shadow:1px 1px 6px rgba(14,165,233,0.09);
+    }
+    .lead {
+      font-size: 1.13em;
+      color: #222;
+      margin-bottom: 22px;
+      line-height: 1.6;
+      background: #f4fbff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(14,165,233,0.04);
+    }
+    .catchcopy-top {
+      font-size: 1.19em;
+      color: #ff7a00;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding: 10px 10px 6px 10px;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+    }
+    .start-btn {
+      padding: 15px 40px;
+      font-size: 1.18em;
+      background: linear-gradient(90deg,#0ea5e9 60%,#ff7a00 100%);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(14,165,233,0.13);
+      transition: background 0.19s, transform 0.15s;
+      margin-top: 16px;
+    }
+    .start-btn:hover, .restart-btn:hover {
+      background: linear-gradient(90deg,#0ea5e9 80%,#ff7a00 100%);
+      transform: scale(1.04);
+    }
+    .restart-btn {
+      padding: 12px 38px;
+      font-size: 1.12em;
+      background: linear-gradient(90deg,#ff7a00 60%,#0ea5e9 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(255,122,0,0.11);
+      transition: background 0.15s, transform 0.13s;
+      margin: 26px auto 0 auto;
+      display: block;
+    }
+    .progress {
+      font-size: 1em;
+      color: #0ea5e9;
+      text-align: right;
+      width: 100%;
+      font-weight: 500;
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+    }
+    .question {
+      font-size: 1.32em;
+      font-weight: bold;
+      margin-bottom: 22px;
+      color: #222;
+      margin-top: 8px;
+      text-align: center;
+      padding-bottom: 4px;
+      border-bottom: 1.5px dashed #d2e9f7;
+      width: 100%;
+    }
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .choice-btn {
+      padding: 15px 10px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(90deg,#dff6ff 25%,#f4fbff 100%);
+      color: #222;
+      font-size: 1.06em;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(14,165,233,0.07);
+      cursor: pointer;
+      transition: background 0.17s, transform 0.17s;
+      letter-spacing: 0.02em;
+      border: 1.5px solid #d2e9f7;
+    }
+    .choice-btn:hover {
+      background: linear-gradient(90deg,#fffbf7 10%, #dff6ff 90%);
+      color: #0ea5e9;
+      transform: scale(1.03);
+      border-color: #0ea5e9;
+    }
+    .card-result {
+      animation: popIn 0.7s cubic-bezier(.28,.84,.42,1);
+      background: linear-gradient(135deg, #fff 60%, #dff6ff 100%);
+      border: 2.2px solid #0ea5e9;
+      min-height: 420px;
+    }
+    .result-flex {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      justify-items: center;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .result-block {
+      width: 100%;
+      max-width: 340px;
+      background: #f4fbff;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(14,165,233,0.10);
+      padding: 17px 12px 8px 12px;
+      border: 1.5px solid #d2e9f7;
+      margin-bottom: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wine-img, .spot-img {
+      width: 100%;
+      max-width: 210px;
+      border-radius: 13px;
+      box-shadow: 0 2px 8px rgba(14,165,233,0.09);
+      margin-bottom: 8px;
+      background: #fff;
+      border:2px solid #d2e9f7;
+    }
+    .wine-title {
+      font-size: 1.14em;
+      font-weight: bold;
+      color: #0ea5e9;
+      margin: 10px 0 6px;
+      letter-spacing:0.04em;
+      text-align:center;
+    }
+    .wine-desc {
+      font-size: 1.05em;
+      margin-bottom: 10px;
+      color: #222;
+      text-align:left;
+    }
+    .spot-title {
+      font-size: 1.09em;
+      font-weight: bold;
+      margin: 10px 0 5px;
+      color: #ff7a00;
+      letter-spacing:0.04em;
+      text-align:center;
+    }
+    .spot-desc {
+      font-size: 1em;
+      color: #222;
+      text-align:left;
+    }
+    .result-style {
+      background: linear-gradient(90deg,#dff6ff 70%,#fff 100%);
+      border-radius: 13px;
+      padding: 13px 19px;
+      font-size: 1.12em;
+      margin-top: 13px;
+      color: #222;
+      font-weight: bold;
+      text-align:center;
+      box-shadow:0 2px 12px rgba(14,165,233,0.09);
+      border: 1.5px solid #d2e9f7;
+    }
+    .result-special {
+      margin:24px 0 0 0;
+      font-size:1.13em;
+      color:#ff7a00;
+      font-weight:bold;
+      text-align:center;
+      background:linear-gradient(90deg,#fff 80%,#ffe7d4 100%);
+      border-radius:13px;
+      padding:12px 5px;
+      letter-spacing:0.04em;
+      box-shadow:0 2px 8px rgba(255,122,0,0.10);
+      border: 1px solid #ffd6b0;
+    }
+    .share-btns {
+      margin: 18px 0 10px 0;
+      display: flex;
+      gap: 16px;
+      justify-content: left;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1em;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(14,165,233,0.06);
+      border: 1px solid #d2e9f7;
+      background: #fff;
+      color: #0ea5e9;
+      transition: background 0.17s, color 0.13s;
+    }
+    .share-btn:hover { background: #dff6ff; color: #ff7a00;}
+    .share-x {color: #0ea5e9;}
+    .share-fb {color: #1976d2;}
+    .share-line {color: #00bcd4;}
+    .googleform-btn {
+      margin-top: 12px;
+      padding: 10px 24px;
+      background: linear-gradient(90deg,#0ea5e9 70%,#ff7a00 100%);
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      font-size: 1.07em;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(33,120,220,0.09);
+      border: 1.5px solid #d2e9f7;
+      transition: background 0.15s;
+    }
+    .googleform-btn:hover { background: linear-gradient(90deg,#ff7a00 60%,#0ea5e9 100%);}
+    @media (min-width: 700px) {
+      .result-flex {grid-template-columns: 1fr 1fr;}
+      .card {padding: 38px 44px 38px 44px;}
+      .lead {font-size: 1.18em;}
+      .catchcopy-top {font-size: 1.22em;}
+    }
+    @media (max-width:600px){
+      .result-flex{grid-template-columns: 1fr;}
+      .card{padding: 16px;}
+      .wine-img,.spot-img{max-width:98vw;}
+      .result-block{max-width:98vw;}
+      .big-title{font-size:1.25em;}
+      .lead{font-size:1.05em;}
+      .catchcopy-top{font-size: 1.11em;}
+    }
+    @keyframes popIn {
+      0% {transform: scale(0.95);opacity:0;}
+      60% {transform: scale(1.06);}
+      100% {transform: scale(1);opacity:1;}
+    }
+    @keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- スタート画面 -->
+    <div class="card card-start" id="startCard">
+      <div class="big-title">あなたにぴったりの<br>大三島ワイナリー旅診断！</div>
+      <div class="lead">
+        10個の質問に答えるだけで、<br>
+        あなたにおすすめの「島ワイン」と「大三島の観光スポット」がわかります！<br>
+        爽やかな海の風を感じる、軽やかな旅のスタイルを見つけてみませんか？
+      </div>
+      <button class="start-btn" onclick="startQuiz()">診断をはじめる</button>
+    </div>
+    <!-- 診断質問ページ -->
+    <div class="card card-quiz" id="quizCard" style="display:none;">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+    <!-- 結果ページ -->
+    <div class="card card-result" id="resultCard" style="display:none;">
+      <!-- 画面上部にキャッチコピー表示 -->
+      <div id="catchCopyTop" class="catchcopy-top"></div>
+      <div class="result-flex">
+        <div class="result-block" id="wineArea">
+          <img id="wineImage" src="" alt="ワイン画像" class="wine-img">
+          <div class="wine-title" id="wineTitle"></div>
+          <div class="wine-desc" id="wineDesc"></div>
+        </div>
+        <div class="result-block" id="spotArea">
+          <img id="spotImage" src="" alt="スポット画像" class="spot-img">
+          <h1 class="spot-title" id="spotTitle"></h1>
+          <div class="spot-desc" id="spotDesc"></div>
+        </div>
+      </div>
+      <div class="result-style" id="styleComment"></div>
+      <div class="result-special">
+        本日限定！大三島みんなのワイナリーにて無料試飲会開催中！
+      </div>
+      <div class="share-btns">
+        <a id="shareX" class="share-btn share-x" target="_blank" rel="noopener" href="#"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" width="22">シェア</a>
+        <a id="shareFB" class="share-btn share-fb" target="_blank" rel="noopener" href="#"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook" width="20">シェア</a>
+        <a id="shareLINE" class="share-btn share-line" target="_blank" rel="noopener" href="#"><img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/line.svg" alt="LINE" width="20">送る</a>
+      </div>
+      <a class="googleform-btn" id="googleFormBtn" href="https://docs.google.com/forms/d/e/1FAIpQLScQYRKzuAl7Owcoyv89A20S8LLbKfVSNNlURS-JcKljzwtx0A/viewform?usp=header" target="_blank" rel="noopener">アンケートに協力する（Googleフォーム）</a>
+      <button class="restart-btn" onclick="restartQuiz()">もう一度診断する</button>
+    </div>
+  </div>
+  <script>
+    const wineMap = {
+      A: {
+        name:"島白2024 シャルドネ",
+        img:"images/wine-2.jpg",
+        desc:"定番でつくる大三島の白ワイン。柑橘やパイナップルなど黄色い果実の香り、キレのある酸。後味に感じる塩味も特徴です。"
+      },
+      B: {
+        name:"島ロゼ2024 マスカットベーリーA×メルロー",
+        img:"images/wine-3.jpg",
+        desc:"チャーミングなロゼ。アセロラや赤いベリー系の甘酸っぱい香り、飲み口はすっきりとしていて飲みやすい。和食にぴったりなロゼワインです。"
+      },
+      C: {
+        name:"島で醸す2024デラウェア オレンジ",
+        img:"images/wine-1.jpg",
+        desc:"完熟デラウェアを使用し、皮ごと醸してオレンジワインにしています。自然発酵。白い花、マスカットの甘い香りと程よい渋みがバランスの良い、お食事に寄り添うワインです。"
+      },
+      D: {
+        name:"島みかん2024スパークリング 温州 伊予柑ミックス",
+        img:"images/wine-4.jpg",
+        desc:"柑橘を使用してワインと同じようなつくりで発酵させたスパークリングの柑橘果実酒。甘味はほとんどなく、酸味がたった味わい。伊予柑の皮由来の苦みも特徴的で、ハーブのようなグリーンノートもあり、爽快感の強いお酒になりました。野生酵母、亜硫酸塩不使用、ナチュラルなつくりです。"
+      }
+    };
+
+    const spotMap = {
+      shrine: {
+        name:"大山祇神社",
+        img:"images/spot-5.jpg",
+        desc:"大三島の大山祇神社は、日本総鎮守として名高い格式ある社。樹齢数千年の大楠に迎えられ、瀬戸内の風を感じながら歴史と自然の力を体感できる、訪れる価値のある聖地です。"
+      },
+      tatara: {
+        name:"多々羅展望台",
+        img:"images/spot-6.jpg",
+        desc:"多々羅展望台は、サイクリングルート沿いにありながら案内が控えめで見落とされがちな秘境。55ｍの丘の上に立つ三角アーチ越しに、多々羅大橋と瀬戸内の多島美を静かに独占できる、感動的な穴場スポットです。"
+      },
+      ito: {
+        name:"伊東豊雄ミュージアム",
+        img:"images/spot-7.jpg",
+        desc:"大三島の美しい瀬戸内を背に、建築界の巨匠・伊東豊雄が設計した「スティールハット」「シルバーハット」の２棟が主役。作品展示とワークショップ空間が融合し、建物そのものが驚きと癒しを誘う体験型ミュージアムです。"
+      },
+      tokoro: {
+        name:"ところミュージアム大三島",
+        img:"images/spot-8.jpg",
+        desc:"光と風、アートと島々が一体化する「ところミュージアム大三島」。ノエ・カッツの“キッシング・ドア”に迎えられ、傾斜に沿って展示を巡ると、最後は瀬戸内の多島美が心に染みる絶景テラスが待ち受ける空間です。"
+      },
+      beach: {
+        name:"台（うてな）海水浴場",
+        img:"images/spot-9.jpg",
+        desc:"瀬戸内・大三島最大の「台海水浴場」は、白砂青松と澄んだ海が広がる絶景スポット。キャンプ場や温泉も隣接し、家族や友人と一日中楽しめる人気の海水浴場です。"
+      }
+    };
+
+    const questions = [
+      { text:"旅行中に一番ワクワクする瞬間は？", choices:[
+        {text:"新しい景色を見たとき", type:"A"},
+        {text:"歴史を感じた瞬間", type:"B"},
+        {text:"地元の人と交流した瞬間", type:"C"},
+        {text:"アクティビティに挑戦した瞬間", type:"D"} ]},
+      { text:"好きな写真のテーマは？", choices:[
+        {text:"絶景・自然", type:"A"},
+        {text:"建築物", type:"B"},
+        {text:"人や笑顔", type:"C"},
+        {text:"動きのある瞬間", type:"D"} ]},
+      { text:"旅行計画はどう立てる？", choices:[
+        {text:"行き当たりばったり", type:"A"},
+        {text:"事前にしっかり計画", type:"B"},
+        {text:"現地のおすすめを聞く", type:"C"},
+        {text:"天気や気分で変更", type:"D"} ]},
+      { text:"好きな飲み物の傾向は？", choices:[
+        {text:"すっきり爽やか", type:"A"},
+        {text:"香りが上品", type:"B"},
+        {text:"甘みと酸味のバランス", type:"C"},
+        {text:"フルーティーで軽やか", type:"D"} ]},
+      { text:"旅行先で一番大事にするのは？", choices:[
+        {text:"景色", type:"A"},
+        {text:"歴史", type:"B"},
+        {text:"人とのつながり", type:"C"},
+        {text:"体験", type:"D"} ]},
+      { text:"好きな季節は？", choices:[
+        {text:"春", type:"A"},
+        {text:"夏", type:"B"},
+        {text:"秋", type:"C"},
+        {text:"冬", type:"D"} ]},
+      { text:"旅の思い出はどう残す？", choices:[
+        {text:"写真フォルダいっぱい", type:"A"},
+        {text:"日記や記録", type:"B"},
+        {text:"SNSでシェア", type:"C"},
+        {text:"お土産で残す", type:"D"} ]},
+      { text:"一番テンションが上がる瞬間は？", choices:[
+        {text:"絶景スポット到着", type:"A"},
+        {text:"神社や史跡で静かに過ごす", type:"B"},
+        {text:"カフェや交流の場でおしゃべり", type:"C"},
+        {text:"海や山で体を動かす", type:"D"} ]},
+      { text:"ワインを選ぶときの基準は？", choices:[
+        {text:"香りの爽やかさ", type:"A"},
+        {text:"重厚な味わい", type:"B"},
+        {text:"色と華やかさ", type:"C"},
+        {text:"飲みやすさ", type:"D"} ]},
+      { text:"友人に「私の旅スタイル」を説明すると？", choices:[
+        {text:"冒険心いっぱい", type:"A"},
+        {text:"落ち着いていて計画的", type:"B"},
+        {text:"人と繋がるのが好き", type:"C"},
+        {text:"アクティブで明るい", type:"D"} ]}
+    ];
+
+    function getSpotType(typeCounts) {
+      const maxType = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0][0];
+      switch(maxType){
+        case 'A': return 'tatara';
+        case 'B': return 'shrine';
+        case 'C': return 'ito';
+        case 'D': return 'beach';
+        default: return 'tatara';
+      }
+    }
+
+    function createCombinationComment(wineType, spotKey) {
+      const wine = wineMap[wineType];
+      const spot = spotMap[spotKey];
+      return `あなたの旅は、${wine.name}と${spot.name}で最高にワクワクする体験へ！美しい風景とともに、島ワインの魅力が広がる特別な冒険が待っています。今すぐ新しい旅へ出かけましょう！`;
+    }
+
+    let currentQ = 0;
+    let answers = [];
+
+    function startQuiz() {
+      document.getElementById('startCard').style.display = 'none';
+      currentQ = 0; answers = [];
+      showQuestion(currentQ);
+    }
+
+    function showQuestion(idx){
+      document.getElementById('quizCard').style.display = 'flex';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('progress').textContent = `Q${idx+1} / 10`;
+      document.getElementById('question').textContent = questions[idx].text;
+      const choicesDiv = document.getElementById('choices');
+      choicesDiv.innerHTML = "";
+      questions[idx].choices.forEach((choice,i)=>{
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = choice.text;
+        btn.onclick = () => {
+          answers.push(choice.type);
+          currentQ++;
+          if(currentQ < questions.length){
+            showQuestion(currentQ);
+          }else{
+            showResult();
+          }
+        };
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function showResult(){
+      document.getElementById('quizCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'flex';
+      const typeCounts = {A:0,B:0,C:0,D:0};
+      answers.forEach(ans=>{ if(typeCounts[ans]!==undefined) typeCounts[ans]++; });
+      const wineKey = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0][0] || "A";
+      const spotKey = getSpotType(typeCounts);
+      const wine = wineMap[wineKey];
+      const spot = spotMap[spotKey];
+      document.getElementById('wineImage').src = wine.img;
+      document.getElementById('wineImage').alt = wine.name;
+      document.getElementById('wineTitle').textContent = wine.name;
+      document.getElementById('wineDesc').textContent = wine.desc;
+      document.getElementById('spotImage').src = spot.img;
+      document.getElementById('spotImage').alt = spot.name;
+      document.getElementById('spotTitle').textContent = spot.name;
+      document.getElementById('spotDesc').textContent = spot.desc;
+      document.getElementById('styleComment').textContent = createCombinationComment(wineKey, spotKey);
+
+      // キャッチコピー（ワイン名で厳密対応）
+      const copyByWineName = {
+        "島白2024 シャルドネ": "清々しい島時間に、爽やかな一杯を。",
+        "島ロゼ2024 マスカットベーリーA×メルロー": "会話が弾む、軽やかなロゼと景色を。",
+        "島で醸す2024デラウェア オレンジ": "未知を楽しむあなたに、冒険色の一杯を。",
+        "島みかん2024スパークリング 温州 伊予柑ミックス": "柑橘の泡で、瀬戸内をもっと爽快に。",
+      };
+      document.getElementById("catchCopyTop").textContent =
+        copyByWineName[wine.name] || copyByWineName["島白2024 シャルドネ"];
+
+      // シェア機能
+      const shareUrl = encodeURIComponent(window.location.href);
+      const shareText = encodeURIComponent(
+        `私は「${wine.name}」×「${spot.name}」旅タイプでした！ #大三島みんなのワイナリー診断`
+      );
+      document.getElementById('shareX').href =
+        `https://x.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+      document.getElementById('shareFB').href =
+        `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+      document.getElementById('shareLINE').href =
+        `https://social-plugins.line.me/lineit/share?url=${shareUrl}`;
+      document.getElementById('googleFormBtn').href =
+        "https://docs.google.com/forms/d/e/1FAIpQLScQYRKzuAl7Owcoyv89A20S8LLbKfVSNNlURS-JcKljzwtx0A/viewform?usp=header";
+    }
+
+    function restartQuiz() {
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('startCard').style.display = 'flex';
+      currentQ = 0;
+      answers = [];
+    }
+
+    window.onload = function(){
+      document.getElementById('startCard').style.display = 'flex';
+      document.getElementById('quizCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
